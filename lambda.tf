@@ -4,10 +4,15 @@ resource "aws_lambda_function" "lambda" {
   memory_size      = 1024
   package_type     = "Zip"
   role             = aws_iam_role.lambda_role.arn
-  runtime          = "nodejs12.x"
+  runtime          = "nodejs14.x"
   filename         = "api-gw-backend.zip"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-  timeout          = 900
+  timeout          = 60
+  architectures    = ["arm64"]
+
+  layers = [
+    "arn:aws:lambda:${var.region}:580247275435:layer:LambdaInsightsExtension-Arm64:2" # https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Lambda-Insights-extension-versionsARM.html
+  ]
 }
 
 data "archive_file" "lambda_zip" {
